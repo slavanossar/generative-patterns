@@ -245,6 +245,6 @@ onMounted(() => {
     nextTick(animate)
   })
 
-  watchThrottled([duration, delay], animate, { throttle: 500 })
+  watchThrottled([duration, delay, pulses], animate, { throttle: 500 })
 })
 </script>
