@@ -38,6 +38,17 @@
             <label for="rotate">Rotate</label>
             <input id="rotate" v-model="rotate" type="checkbox" />
           </div>
+        </div>
+        <div class="space-y-2">
+          <div class="flex space-x-4 items-center w-full justify-between">
+            <label for="pulses">Pulses</label>
+            <input
+              id="pulses"
+              v-model="pulses"
+              class="text-black px-1"
+              type="number"
+            />
+          </div>
           <div class="flex space-x-4 items-center w-full justify-between">
             <label for="duration">Duration</label>
             <input
@@ -185,37 +196,33 @@ async function saveImage() {
 }
 
 const animation = ref(null)
-const duration = ref(3000)
-const delay = ref(150)
+const pulses = ref(3)
+const duration = ref(4500)
+const delay = ref(200)
 const isPaused = ref(false)
+
+const keyframes = [
+  {
+    rx: [sideLength.value / 2, sideLength.value / 15],
+    scale: [SCALE_MIN, SCALE_MAX],
+    rotate: rotate.value ? [45, 45] : [0, 0],
+  },
+  {
+    rx: [sideLength.value / 15, sideLength.value / 2],
+    scale: [SCALE_MAX, SCALE_MIN],
+    rotate: rotate.value ? 45 : [0, 0],
+  },
+]
 
 function animate() {
   anime.remove('svg .dot')
 
   animation.value = anime({
     targets: 'svg .dot',
-    keyframes: [
-      {
-        rx: [sideLength.value / 2, sideLength.value / 15],
-        scale: [SCALE_MIN, SCALE_MAX],
-        rotate: rotate.value ? [45, 45] : [0, 0],
-      },
-      {
-        rx: [sideLength.value / 15, sideLength.value / 2],
-        scale: [SCALE_MAX, SCALE_MIN],
-        rotate: rotate.value ? 45 : [0, 0],
-      },
-      {
-        rx: [sideLength.value / 2, sideLength.value / 15],
-        scale: [SCALE_MIN, SCALE_MAX],
-        rotate: rotate.value ? [45, 45] : [0, 0],
-      },
-      {
-        rx: [sideLength.value / 15, sideLength.value / 2],
-        scale: [SCALE_MAX, SCALE_MIN],
-        rotate: rotate.value ? 45 : [0, 0],
-      },
-    ],
+    keyframes: Array.from(
+      { length: keyframes.length * pulses.value },
+      (_, i) => keyframes[i % keyframes.length],
+    ),
     duration: duration.value,
     delay: anime.stagger(delay.value, {
       grid: [dimension.value, dimension.value],
