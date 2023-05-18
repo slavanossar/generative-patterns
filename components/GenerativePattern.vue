@@ -20,12 +20,31 @@
             :height="svgSize"
             :fill="settingsStore.backgroundColour"
           />
-          <rect
-            v-for="(shape, index) in activeShapes"
-            :key="index"
-            :fill="settingsStore.foregroundColour"
-            class="dot"
-            v-bind="shape"
+          <defs v-if="base64Image">
+            <mask id="mask">
+              <rect
+                v-for="(shape, index) in activeShapes"
+                :key="index"
+                :fill="settingsStore.foregroundColour"
+                class="dot"
+                v-bind="shape"
+              />
+            </mask>
+          </defs>
+          <g v-else>
+            <rect
+              v-for="(shape, index) in activeShapes"
+              :key="index"
+              :fill="settingsStore.foregroundColour"
+              class="dot"
+              v-bind="shape"
+            />
+          </g>
+          <image
+            :xlink:href="base64Image"
+            width="100%"
+            height="100%"
+            mask="url(#mask)"
           />
         </svg>
       </div>
@@ -92,6 +111,21 @@
             v-model="settingsStore.foregroundColour"
             label="Foreground Colour"
           />
+          <div class="flex space-x-4 items-center w-full justify-between">
+            <label for="image">Image</label>
+            <button v-if="file" class="btn" type="button" @click="onClearInput">
+              Remove Image
+            </button>
+            <input
+              id="image"
+              ref="fileInput"
+              :class="file ? 'hidden' : ''"
+              class="text-black px-1"
+              type="file"
+              accept=".jpg,.jpeg,.png"
+              @change="onChangeFile"
+            />
+          </div>
         </div>
         <div class="space-y-2">
           <h2>Settings</h2>
@@ -253,12 +287,36 @@ function toggleAnimationPlayback() {
   isPaused.value = !isPaused.value
 }
 
+const fileInput = ref(null)
+const file = ref(null)
+const base64Image = ref('')
+
+function onChangeFile(event) {
+  file.value = event.target.files[0]
+
+  if (file.value) {
+    const reader = new FileReader()
+
+    reader.addEventListener('load', (e) => {
+      base64Image.value = e.target.result
+    })
+
+    reader.readAsDataURL(file.value)
+  }
+}
+
+function onClearInput() {
+  fileInput.value.value = null
+  file.value = null
+  base64Image.value = ''
+}
+
 const { duration, delay, pulses } = toRefs(settingsStore)
 
 onMounted(() => {
   animate()
 
-  watch(activeShapes, () => {
+  watch([activeShapes, base64Image], () => {
     nextTick(animate)
   })
 
