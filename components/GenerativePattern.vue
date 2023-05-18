@@ -41,6 +41,7 @@
             />
           </g>
           <image
+            v-if="base64Image"
             :xlink:href="base64Image"
             width="100%"
             height="100%"
