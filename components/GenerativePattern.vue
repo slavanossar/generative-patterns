@@ -201,21 +201,21 @@ const duration = ref(4500)
 const delay = ref(200)
 const isPaused = ref(false)
 
-const keyframes = [
-  {
-    rx: [sideLength.value / 2, sideLength.value / 15],
-    scale: [SCALE_MIN, SCALE_MAX],
-    rotate: rotate.value ? [45, 45] : [0, 0],
-  },
-  {
-    rx: [sideLength.value / 15, sideLength.value / 2],
-    scale: [SCALE_MAX, SCALE_MIN],
-    rotate: rotate.value ? 45 : [0, 0],
-  },
-]
-
 function animate() {
   anime.remove('svg .dot')
+
+  const keyframes = [
+    {
+      rx: [sideLength.value / 2, sideLength.value / 15],
+      scale: [SCALE_MIN, SCALE_MAX],
+      rotate: rotate.value ? [45, 45] : [0, 0],
+    },
+    {
+      rx: [sideLength.value / 15, sideLength.value / 2],
+      scale: [SCALE_MAX, SCALE_MIN],
+      rotate: rotate.value ? 45 : [0, 0],
+    },
+  ]
 
   animation.value = anime({
     targets: 'svg .dot',
