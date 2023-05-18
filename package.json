@@ -40,6 +40,7 @@
   "dependencies": {
     "@nuxtjs/robots": "^3.0.0",
     "@nuxtjs/tailwindcss": "^6.7.0",
+    "@pinia-plugin-persistedstate/nuxt": "^1.1.1",
     "@pinia/nuxt": "^0.4.10",
     "@vueuse/core": "^9.6.0",
     "@vueuse/nuxt": "^9.6.0",

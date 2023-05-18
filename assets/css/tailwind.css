@@ -18,3 +18,7 @@
 .page-leave-to {
   @apply opacity-0;
 }
+
+.btn {
+  @apply flex-1 border-2 font-bold border-current flex justify-center items-center rounded;
+}

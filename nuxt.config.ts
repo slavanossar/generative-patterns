@@ -11,6 +11,7 @@ export default defineNuxtConfig({
     '@nuxtjs/robots',
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
+    '@pinia-plugin-persistedstate/nuxt',
     '@vue-macros/nuxt',
     '@vueuse/nuxt',
     'nuxt-simple-sitemap',

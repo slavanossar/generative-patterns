@@ -1,9 +1,12 @@
 <template>
   <div
-    :style="`background-color: ${backgroundColour}`"
+    :style="`background-color: ${settingsStore.backgroundColour}`"
     class="w-screen h-screen p-10"
   >
-    <div :style="`color: ${foregroundColour}`" class="flex space-x-10">
+    <div
+      :style="`color: ${settingsStore.foregroundColour}`"
+      class="flex space-x-10"
+    >
       <div class="aspect-square flex-grow">
         <svg
           ref="svgElement"
@@ -12,11 +15,15 @@
           :viewBox="`0 0 ${svgSize} ${svgSize}`"
           class="w-full h-full"
         >
-          <rect :width="svgSize" :height="svgSize" :fill="backgroundColour" />
+          <rect
+            :width="svgSize"
+            :height="svgSize"
+            :fill="settingsStore.backgroundColour"
+          />
           <rect
             v-for="(shape, index) in activeShapes"
             :key="index"
-            :fill="foregroundColour"
+            :fill="settingsStore.foregroundColour"
             class="dot"
             v-bind="shape"
           />
@@ -28,7 +35,7 @@
             <label for="dimension">Dimension</label>
             <input
               id="dimension"
-              v-model="dimension"
+              v-model="settingsStore.dimension"
               min="3"
               max="25"
               type="range"
@@ -36,7 +43,7 @@
           </div>
           <div class="flex space-x-4 items-center">
             <label for="rotate">Rotate</label>
-            <input id="rotate" v-model="rotate" type="checkbox" />
+            <input id="rotate" v-model="settingsStore.rotate" type="checkbox" />
           </div>
         </div>
         <div class="space-y-2">
@@ -44,7 +51,7 @@
             <label for="pulses">Pulses</label>
             <input
               id="pulses"
-              v-model="pulses"
+              v-model="settingsStore.pulses"
               class="text-black px-1"
               type="number"
             />
@@ -53,7 +60,7 @@
             <label for="duration">Duration</label>
             <input
               id="duration"
-              v-model="duration"
+              v-model="settingsStore.duration"
               class="text-black px-1"
               type="number"
             />
@@ -62,31 +69,43 @@
             <label for="delay">Delay</label>
             <input
               id="delay"
-              v-model="delay"
+              v-model="settingsStore.delay"
               class="text-black px-1"
               type="number"
             />
           </div>
         </div>
         <div class="flex space-x-2">
-          <button
-            class="flex-1 border-2 font-bold border-current flex justify-center items-center rounded"
-            type="button"
-            @click="toggleAnimationPlayback"
-          >
+          <button class="btn" type="button" @click="toggleAnimationPlayback">
             {{ isPaused ? 'Play' : 'Pause' }}
           </button>
-          <button
-            class="flex-1 border-2 font-bold border-current flex justify-center items-center rounded"
-            type="button"
-            @click="saveImage"
-          >
+          <button class="btn" type="button" @click="saveImage">
             Save Image
           </button>
         </div>
         <div class="space-y-2">
-          <LvColorPicker v-model="backgroundColour" label="Background Colour" />
-          <LvColorPicker v-model="foregroundColour" label="Foreground Colour" />
+          <LvColorPicker
+            v-model="settingsStore.backgroundColour"
+            label="Background Colour"
+          />
+          <LvColorPicker
+            v-model="settingsStore.foregroundColour"
+            label="Foreground Colour"
+          />
+        </div>
+        <div class="space-y-2">
+          <h2>Settings</h2>
+          <div class="flex space-x-2">
+            <button class="btn" type="button" @click="settingsStore.save">
+              Save
+            </button>
+            <button class="btn" type="button" @click="settingsStore.load">
+              Load
+            </button>
+            <button class="btn" type="button" @click="settingsStore.$reset">
+              Reset
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -97,19 +116,18 @@
 import anime from 'animejs'
 import { Canvg, presets } from 'canvg'
 
+import { useSettingsStore } from '@/stores/settings'
+
 const SCALE_MIN = 0.5
 const SCALE_MAX = 0.97
 
 const svgElement = ref()
 const svgSize = ref(2400)
-const dimension = ref(15)
-const rotate = ref(false)
 
-const backgroundColour = ref('#A797FA')
-const foregroundColour = ref('#D9D9D9')
+const settingsStore = useSettingsStore()
 
 const sideLength = computed(() => {
-  return svgSize.value / dimension.value
+  return svgSize.value / settingsStore.dimension
 })
 
 const rotatedSideLength = computed(() => {
@@ -123,9 +141,9 @@ const rotatedDelta = computed(() => {
 const shapes = computed(() => {
   const arr = []
 
-  for (let i = 0; i < dimension.value ** 2; i++) {
-    const colIndex = i % dimension.value
-    const rowIndex = Math.floor(i / dimension.value)
+  for (let i = 0; i < settingsStore.dimension ** 2; i++) {
+    const colIndex = i % settingsStore.dimension
+    const rowIndex = Math.floor(i / settingsStore.dimension)
 
     const x = sideLength.value * colIndex
     const y = sideLength.value * rowIndex
@@ -149,9 +167,9 @@ const shapes = computed(() => {
 const rotatedShapes = computed(() => {
   const arr = []
 
-  for (let i = 0; i < dimension.value ** 2; i++) {
-    const colIndex = i % dimension.value
-    const rowIndex = Math.floor(i / dimension.value)
+  for (let i = 0; i < settingsStore.dimension ** 2; i++) {
+    const colIndex = i % settingsStore.dimension
+    const rowIndex = Math.floor(i / settingsStore.dimension)
 
     const x =
       (2 * colIndex + 1) * rotatedDelta.value +
@@ -177,7 +195,7 @@ const rotatedShapes = computed(() => {
 })
 
 const activeShapes = computed(() => {
-  return rotate.value ? rotatedShapes.value : shapes.value
+  return settingsStore.rotate ? rotatedShapes.value : shapes.value
 })
 
 const preset = presets.offscreen()
@@ -196,9 +214,6 @@ async function saveImage() {
 }
 
 const animation = ref(null)
-const pulses = ref(3)
-const duration = ref(4500)
-const delay = ref(200)
 const isPaused = ref(false)
 
 function animate() {
@@ -208,24 +223,24 @@ function animate() {
     {
       rx: [sideLength.value / 2, sideLength.value / 15],
       scale: [SCALE_MIN, SCALE_MAX],
-      rotate: rotate.value ? [45, 45] : [0, 0],
+      rotate: settingsStore.rotate ? [45, 45] : [0, 0],
     },
     {
       rx: [sideLength.value / 15, sideLength.value / 2],
       scale: [SCALE_MAX, SCALE_MIN],
-      rotate: rotate.value ? 45 : [0, 0],
+      rotate: settingsStore.rotate ? 45 : [0, 0],
     },
   ]
 
   animation.value = anime({
     targets: 'svg .dot',
     keyframes: Array.from(
-      { length: keyframes.length * pulses.value },
+      { length: keyframes.length * settingsStore.pulses },
       (_, i) => keyframes[i % keyframes.length],
     ),
-    duration: duration.value,
-    delay: anime.stagger(delay.value, {
-      grid: [dimension.value, dimension.value],
+    duration: settingsStore.duration,
+    delay: anime.stagger(settingsStore.delay, {
+      grid: [settingsStore.dimension, settingsStore.dimension],
       from: 'center',
     }),
     easing: 'easeInOutQuad',
@@ -248,3 +263,10 @@ onMounted(() => {
   watchThrottled([duration, delay, pulses], animate, { throttle: 500 })
 })
 </script>
+
+<style lang="postcss" scoped>
+h2,
+label {
+  @apply font-bold;
+}
+</style>
