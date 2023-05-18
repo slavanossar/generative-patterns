@@ -253,6 +253,8 @@ function toggleAnimationPlayback() {
   isPaused.value = !isPaused.value
 }
 
+const { duration, delay, pulses } = toRefs(settingsStore)
+
 onMounted(() => {
   animate()
 
@@ -260,11 +262,7 @@ onMounted(() => {
     nextTick(animate)
   })
 
-  watchThrottled(
-    [settingsStore.duration, settingsStore.delay, settingsStore.pulses],
-    animate,
-    { throttle: 500 },
-  )
+  watchThrottled([duration, delay, pulses], animate, { throttle: 500 })
 })
 </script>
 
