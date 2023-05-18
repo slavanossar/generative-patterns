@@ -43,6 +43,7 @@
           <image
             v-if="base64Image"
             :xlink:href="base64Image"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
             width="100%"
             height="100%"
             mask="url(#mask)"
