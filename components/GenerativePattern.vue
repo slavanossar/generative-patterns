@@ -51,7 +51,7 @@
         </svg>
       </div>
       <div
-        class="w-80 flex-none flex-col space-y-10 h-full overflow-y-auto p-10 pl-0"
+        class="w-96 flex-none flex-col space-y-10 h-full overflow-y-auto p-10 pl-0"
       >
         <div class="space-y-2">
           <div class="flex space-x-4 items-center justify-between">
@@ -71,28 +71,28 @@
         </div>
         <div class="space-y-2">
           <div class="flex space-x-4 items-center w-full justify-between">
-            <label for="pulses">Pulses</label>
+            <label for="waves">Waves</label>
             <input
-              id="pulses"
-              v-model="settingsStore.pulses"
+              id="waves"
+              v-model="settingsStore.waves"
               class="text-black px-1"
               type="number"
             />
           </div>
           <div class="flex space-x-4 items-center w-full justify-between">
-            <label for="duration">Duration</label>
+            <label for="period">Period</label>
             <input
-              id="duration"
-              v-model="settingsStore.duration"
+              id="period"
+              v-model="settingsStore.period"
               class="text-black px-1"
               type="number"
             />
           </div>
           <div class="flex space-x-4 items-center w-full justify-between">
-            <label for="delay">Delay</label>
+            <label for="wavelength">Wavelength</label>
             <input
-              id="delay"
-              v-model="settingsStore.delay"
+              id="wavelength"
+              v-model="settingsStore.wavelength"
               class="text-black px-1"
               type="number"
             />
@@ -324,11 +324,11 @@ function animate() {
   animation.value = anime({
     targets: 'svg .dot',
     keyframes: Array.from(
-      { length: keyframes.length * settingsStore.pulses },
+      { length: keyframes.length * settingsStore.waves },
       (_, i) => keyframes[i % keyframes.length],
     ),
-    duration: settingsStore.duration,
-    delay: anime.stagger(settingsStore.delay, {
+    duration: settingsStore.period * settingsStore.waves,
+    delay: anime.stagger(settingsStore.period / settingsStore.wavelength, {
       grid: [settingsStore.dimension, settingsStore.dimension],
       from: 'center',
     }),
@@ -382,7 +382,7 @@ function onClearInput() {
   base64Image.value = ''
 }
 
-const { duration, delay, pulses } = toRefs(settingsStore)
+const { wavelength, period, waves } = toRefs(settingsStore)
 
 onMounted(() => {
   animate()
@@ -391,7 +391,7 @@ onMounted(() => {
     nextTick(animate)
   })
 
-  watchThrottled([duration, delay, pulses], animate, { throttle: 500 })
+  watchThrottled([wavelength, period, waves], animate, { throttle: 500 })
 })
 </script>
 
