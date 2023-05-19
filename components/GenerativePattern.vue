@@ -1,19 +1,19 @@
 <template>
   <div
     :style="`background-color: ${settingsStore.backgroundColour}`"
-    class="w-screen h-screen p-10"
+    class="w-screen h-screen"
   >
     <div
       :style="`color: ${settingsStore.foregroundColour}`"
-      class="flex space-x-10"
+      class="flex h-full"
     >
-      <div class="aspect-square flex-grow">
+      <div class="flex justify-center items-center flex-grow p-10">
         <svg
           ref="svgElement"
           :width="svgSize"
           :height="svgSize"
           :viewBox="`0 0 ${svgSize} ${svgSize}`"
-          class="w-full h-full"
+          class="w-full h-full object-contain"
         >
           <rect
             :width="svgSize"
@@ -50,7 +50,9 @@
           />
         </svg>
       </div>
-      <div class="w-72 flex-none flex-col space-y-10">
+      <div
+        class="w-80 flex-none flex-col space-y-10 h-full overflow-y-auto p-10 pl-0"
+      >
         <div class="space-y-2">
           <div class="flex space-x-4 items-center justify-between">
             <label for="dimension">Dimension</label>
@@ -96,13 +98,42 @@
             />
           </div>
         </div>
-        <div class="flex space-x-2">
-          <button class="btn" type="button" @click="toggleAnimationPlayback">
-            {{ isPaused ? 'Play' : 'Pause' }}
-          </button>
-          <button class="btn" type="button" @click="saveImage">
-            Save Image
-          </button>
+        <div class="space-y-2">
+          <h2>Playback</h2>
+          <div class="flex space-x-2">
+            <button
+              class="h-8 w-8 flex justify-center items-center flex-none text-xl"
+              type="button"
+              @click="toggleAnimationPlayback"
+            >
+              <svg
+                class="fill-current"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  :d="
+                    isPaused
+                      ? 'M14 7.999a.999.999 0 0 0-.427-.819l-10-7A1 1 0 0 0 2 .999V15a.999.999 0 0 0 1.573.819l10-7A.995.995 0 0 0 14 8.001v-.002c0 .001 0 .001 0 0z'
+                      : 'M5 1H2c-.6 0-1 .4-1 1v12c0 .6.4 1 1 1h3c.6 0 1-.4 1-1V2c0-.6-.4-1-1-1zM14 1h-3c-.6 0-1 .4-1 1v12c0 .6.4 1 1 1h3c.6 0 1-.4 1-1V2c0-.6-.4-1-1-1z'
+                  "
+                />
+              </svg>
+            </button>
+            <input
+              ref="progressInput"
+              class="flex-grow"
+              type="range"
+              min="0"
+              max="100"
+              step=".001"
+              value="0"
+              @mousedown="onPause"
+              @input="onSeek()"
+            />
+          </div>
         </div>
         <div class="space-y-2">
           <LvColorPicker
@@ -113,10 +144,13 @@
             v-model="settingsStore.foregroundColour"
             label="Foreground Colour"
           />
+        </div>
+        <div class="space-y-2">
+          <h2>Image</h2>
           <div class="flex space-x-4 items-center w-full justify-between">
-            <label for="image">Image</label>
+            <label for="image">Upload</label>
             <button v-if="file" class="btn" type="button" @click="onClearInput">
-              Remove Image
+              Remove
             </button>
             <input
               id="image"
@@ -124,22 +158,37 @@
               :class="file ? 'hidden' : ''"
               class="text-black px-1"
               type="file"
-              accept=".jpg,.jpeg,.png"
+              accept=".jpg,.jpeg,.png,.gif"
               @change="onChangeFile"
             />
           </div>
+          <button class="btn w-full" type="button" @click="saveImage">
+            📸 Capture
+          </button>
         </div>
         <div class="space-y-2">
           <h2>Settings</h2>
           <div class="flex space-x-2">
-            <button class="btn" type="button" @click="settingsStore.save">
-              Save
+            <button
+              class="btn flex-1"
+              type="button"
+              @click="settingsStore.save"
+            >
+              📤 Save
             </button>
-            <button class="btn" type="button" @click="settingsStore.load">
-              Load
+            <button
+              class="btn flex-1"
+              type="button"
+              @click="settingsStore.load"
+            >
+              📥 Load
             </button>
-            <button class="btn" type="button" @click="settingsStore.$reset">
-              Reset
+            <button
+              class="btn flex-1"
+              type="button"
+              @click="settingsStore.$reset"
+            >
+              💣 Reset
             </button>
           </div>
         </div>
@@ -250,10 +299,14 @@ async function saveImage() {
 }
 
 const animation = ref(null)
+const progressInput = ref(null)
 const isPaused = ref(false)
 
 function animate() {
-  anime.remove('svg .dot')
+  if (animation.value) {
+    animation.value.pause()
+    anime.remove('svg .dot')
+  }
 
   const keyframes = [
     {
@@ -281,7 +334,23 @@ function animate() {
     }),
     easing: 'easeInOutQuad',
     loop: true,
+    update({ progress }) {
+      progressInput.value.value = Math.round(progress * 1000) / 1000
+    },
   })
+}
+
+function onPause() {
+  animation.value.pause()
+  isPaused.value = true
+}
+
+function onSeek() {
+  if (isPaused.value) {
+    animation.value.seek(
+      animation.value.duration * (progressInput.value.value / 100),
+    )
+  }
 }
 
 function toggleAnimationPlayback() {

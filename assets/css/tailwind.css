@@ -20,5 +20,9 @@
 }
 
 .btn {
-  @apply flex-1 border-2 font-bold border-current flex justify-center items-center rounded;
+  @apply h-8 border-2 font-bold border-current flex justify-center items-center rounded;
+}
+
+input[type='range'] {
+  @apply accent-current;
 }
