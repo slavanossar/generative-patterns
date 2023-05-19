@@ -135,36 +135,50 @@
             />
           </div>
         </div>
-        <div class="space-y-2">
+        <div class="space-y-4">
           <LvColorPicker
             v-model="settingsStore.backgroundColour"
+            class="w-full"
+            hide-palette
             label="Background Colour"
           />
           <LvColorPicker
             v-model="settingsStore.foregroundColour"
+            class="w-full"
+            hide-palette
             label="Foreground Colour"
           />
+          <button class="btn w-full" type="button" @click="randomiseColours">
+            🎲 Randomise
+          </button>
         </div>
         <div class="space-y-2">
           <h2>Image</h2>
-          <div class="flex space-x-4 items-center w-full justify-between">
-            <label for="image">Upload</label>
-            <button v-if="file" class="btn" type="button" @click="onClearInput">
-              Remove
+          <div class="space-y-4">
+            <div class="flex space-x-4 items-center w-full justify-between">
+              <label for="image">Upload</label>
+              <button
+                v-if="file"
+                class="btn"
+                type="button"
+                @click="onClearInput"
+              >
+                Remove
+              </button>
+              <input
+                id="image"
+                ref="fileInput"
+                :class="file ? 'hidden' : ''"
+                class="text-black px-1"
+                type="file"
+                accept=".jpg,.jpeg,.png,.gif"
+                @change="onChangeFile"
+              />
+            </div>
+            <button class="btn w-full" type="button" @click="saveImage">
+              📸 Capture
             </button>
-            <input
-              id="image"
-              ref="fileInput"
-              :class="file ? 'hidden' : ''"
-              class="text-black px-1"
-              type="file"
-              accept=".jpg,.jpeg,.png,.gif"
-              @change="onChangeFile"
-            />
           </div>
-          <button class="btn w-full" type="button" @click="saveImage">
-            📸 Capture
-          </button>
         </div>
         <div class="space-y-2">
           <h2>Settings</h2>
@@ -200,6 +214,7 @@
 <script setup>
 import anime from 'animejs'
 import { Canvg, presets } from 'canvg'
+import randomHexColor from 'random-hex-color'
 
 import { useSettingsStore } from '@/stores/settings'
 
@@ -282,6 +297,11 @@ const rotatedShapes = computed(() => {
 const activeShapes = computed(() => {
   return settingsStore.rotate ? rotatedShapes.value : shapes.value
 })
+
+function randomiseColours() {
+  settingsStore.backgroundColour = randomHexColor()
+  settingsStore.foregroundColour = randomHexColor()
+}
 
 const preset = presets.offscreen()
 
