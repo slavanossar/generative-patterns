@@ -16,7 +16,7 @@
       <div class="text-black/50 flex">
         <button
           v-if="settingsStore.isSaving"
-          class="btn"
+          class="btn w-full"
           type="button"
           @click="onCopy"
         >
@@ -25,7 +25,7 @@
         <button
           v-else
           :disabled="!settingsStore.settingsString"
-          class="btn"
+          class="btn w-full"
           type="btn"
           @click="onLoad"
         >
