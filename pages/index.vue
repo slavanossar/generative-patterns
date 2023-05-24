@@ -1,3 +1,5 @@
 <template>
-  <GenerativePattern />
+  <ClientOnly>
+    <GenerativePattern />
+  </ClientOnly>
 </template>
