@@ -111,7 +111,7 @@
             />
           </div>
           <div class="flex space-x-4 items-center w-full justify-between">
-            <label for="wavelength">Wavelength (squares)</label>
+            <label for="wavelength">Wavelength (units)</label>
             <input
               id="wavelength"
               v-model="settingsStore.wavelength"
