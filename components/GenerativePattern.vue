@@ -13,7 +13,7 @@
           :width="svgSize"
           :height="svgSize"
           :viewBox="`0 0 ${svgSize} ${svgSize}`"
-          class="w-full h-full object-contain"
+          class="w-full h-full object-contain overflow-visible"
         >
           <rect
             :width="svgSize"
@@ -64,6 +64,28 @@
               type="range"
             />
           </div>
+          <div class="flex space-x-4 items-center w-full justify-between">
+            <label for="scaleMin">Min. Scale (%)</label>
+            <input
+              id="scaleMin"
+              v-model="settingsStore.scaleMin"
+              class="text-black px-1"
+              min="0"
+              step="1"
+              type="number"
+            />
+          </div>
+          <div class="flex space-x-4 items-center w-full justify-between">
+            <label for="scaleMax">Max. Scale (%)</label>
+            <input
+              id="scaleMax"
+              v-model="settingsStore.scaleMax"
+              class="text-black px-1"
+              :min="settingsStore.scaleMin"
+              step="1"
+              type="number"
+            />
+          </div>
           <div class="flex space-x-4 items-center">
             <label for="rotate">Rotate</label>
             <input id="rotate" v-model="settingsStore.rotate" type="checkbox" />
@@ -80,7 +102,7 @@
             />
           </div>
           <div class="flex space-x-4 items-center w-full justify-between">
-            <label for="period">Period</label>
+            <label for="period">Period (ms)</label>
             <input
               id="period"
               v-model="settingsStore.period"
@@ -89,7 +111,7 @@
             />
           </div>
           <div class="flex space-x-4 items-center w-full justify-between">
-            <label for="wavelength">Wavelength</label>
+            <label for="wavelength">Wavelength (units)</label>
             <input
               id="wavelength"
               v-model="settingsStore.wavelength"
@@ -218,9 +240,6 @@ import randomHexColor from 'random-hex-color'
 
 import { useSettingsStore } from '@/stores/settings'
 
-const SCALE_MIN = 0.5
-const SCALE_MAX = 0.97
-
 const svgElement = ref()
 const svgSize = ref(2400)
 
@@ -256,7 +275,7 @@ const shapes = computed(() => {
       rx: halfLength / 10,
       x,
       y,
-      transform: `scale(${SCALE_MAX})`,
+      transform: `scale(${settingsStore.scaleMax / 100})`,
       'transform-origin': [x + halfLength, y + halfLength].join(' '),
     })
   }
@@ -286,7 +305,7 @@ const rotatedShapes = computed(() => {
       rx: halfLength / 10,
       x,
       y,
-      transform: `rotate(45) scale(${SCALE_MAX})`,
+      transform: `rotate(45) scale(${settingsStore.scaleMax / 100})`,
       'transform-origin': [x + halfLength, y + halfLength].join(' '),
     })
   }
@@ -331,12 +350,12 @@ function animate() {
   const keyframes = [
     {
       rx: [sideLength.value / 2, sideLength.value / 15],
-      scale: [SCALE_MIN, SCALE_MAX],
+      scale: [settingsStore.scaleMin / 100, settingsStore.scaleMax / 100],
       rotate: settingsStore.rotate ? [45, 45] : [0, 0],
     },
     {
       rx: [sideLength.value / 15, sideLength.value / 2],
-      scale: [SCALE_MAX, SCALE_MIN],
+      scale: [settingsStore.scaleMax / 100, settingsStore.scaleMin / 100],
       rotate: settingsStore.rotate ? 45 : [0, 0],
     },
   ]
@@ -402,7 +421,7 @@ function onClearInput() {
   base64Image.value = ''
 }
 
-const { wavelength, period, waves } = toRefs(settingsStore)
+const { period, scaleMin, scaleMax, wavelength, waves } = toRefs(settingsStore)
 
 onMounted(() => {
   animate()
@@ -411,13 +430,16 @@ onMounted(() => {
     nextTick(animate)
   })
 
-  watchThrottled([wavelength, period, waves], animate, { throttle: 500 })
+  watchThrottled([period, scaleMin, scaleMax, wavelength, waves], animate, {
+    throttle: 500,
+  })
 })
 </script>
 
 <style lang="postcss" scoped>
 h2,
-label {
-  @apply font-bold;
+label,
+:deep(label) {
+  @apply text-sm font-bold;
 }
 </style>

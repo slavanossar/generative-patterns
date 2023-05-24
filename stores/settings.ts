@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 
 const DEFAULT_DIMENSION = 15
+const DEFAULT_SCALE_MIN = 50
+const DEFAULT_SCALE_MAX = 97
 const DEFAULT_ROTATE = false
 const DEFAULT_WAVES = 3
 const DEFAULT_PERIOD = 1000
@@ -12,6 +14,8 @@ export const useSettingsStore = defineStore(
   'ui',
   () => {
     const dimension = ref(DEFAULT_DIMENSION)
+    const scaleMin = ref(DEFAULT_SCALE_MIN)
+    const scaleMax = ref(DEFAULT_SCALE_MAX)
     const rotate = ref(DEFAULT_ROTATE)
 
     const waves = ref(DEFAULT_WAVES)
@@ -28,6 +32,8 @@ export const useSettingsStore = defineStore(
     function save() {
       settingsString.value = JSON.stringify({
         dimension: dimension.value,
+        scaleMin: scaleMin.value,
+        scaleMax: scaleMax.value,
         rotate: rotate.value,
         waves: waves.value,
         period: period.value,
@@ -51,6 +57,8 @@ export const useSettingsStore = defineStore(
         const parsedSettings = JSON.parse(settingsString.value)
 
         dimension.value = parsedSettings.dimension || DEFAULT_DIMENSION
+        scaleMin.value = parsedSettings.scaleMin || DEFAULT_SCALE_MIN
+        scaleMax.value = parsedSettings.scaleMax || DEFAULT_SCALE_MAX
         rotate.value = parsedSettings.rotate || DEFAULT_ROTATE
 
         waves.value = parsedSettings.waves || DEFAULT_WAVES
@@ -68,6 +76,8 @@ export const useSettingsStore = defineStore(
 
     function $reset() {
       dimension.value = DEFAULT_DIMENSION
+      scaleMin.value = DEFAULT_SCALE_MIN
+      scaleMax.value = DEFAULT_SCALE_MAX
       rotate.value = DEFAULT_ROTATE
 
       waves.value = DEFAULT_WAVES
@@ -85,6 +95,8 @@ export const useSettingsStore = defineStore(
     return {
       dimension,
       rotate,
+      scaleMin,
+      scaleMax,
       waves,
       period,
       wavelength,
@@ -103,6 +115,8 @@ export const useSettingsStore = defineStore(
     persist: {
       paths: [
         'dimension',
+        'scaleMin',
+        'scaleMax',
         'rotate',
         'waves',
         'period',
