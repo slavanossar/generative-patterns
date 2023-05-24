@@ -121,7 +121,7 @@
           </div>
         </div>
         <div class="space-y-2">
-          <h2>Playback</h2>
+          <h2>Animation</h2>
           <div class="flex space-x-2">
             <button
               class="h-8 w-8 flex justify-center items-center flex-none text-xl"
@@ -155,6 +155,33 @@
               @mousedown="onPause"
               @input="onSeek()"
             />
+          </div>
+          <div class="flex space-x-4 items-center w-full justify-between">
+            <label for="easing" class="flex items-center space-x-2"
+              ><span>Easing</span>
+              <a href="https://easings.net/" target="_blank"
+                ><svg
+                  class="fill-current"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                >
+                  <path
+                    d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8Zm0 13a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1.623-4.908C9.126 8.519 9 8.663 9 9a1 1 0 1 1-2 0c0-1.294.795-1.976 1.322-2.427.497-.425.623-.57.623-.906 0-.183 0-.667-.944-.667a2.046 2.046 0 0 0-1.258.561A1 1 0 1 1 5.37 4.106a4.075 4.075 0 0 1 2.579-1.104h.003c1.812 0 2.993 1.071 2.993 2.666 0 1.293-.795 1.975-1.321 2.425Z"
+                  /></svg></a
+            ></label>
+            <select
+              id="easing"
+              v-model="settingsStore.easing"
+              class="text-black px-1"
+            >
+              <option
+                v-for="option in easingOptions"
+                :key="option"
+                :value="option"
+                v-text="option"
+              />
+            </select>
           </div>
         </div>
         <div class="space-y-4">
@@ -242,6 +269,46 @@ import { useSettingsStore } from '@/stores/settings'
 
 const svgElement = ref()
 const svgSize = ref(2400)
+
+const easingOptions = [
+  'linear',
+  'easeInSine',
+  'easeOutSine',
+  'easeInOutSine',
+  'easeOutInSine',
+  'easeInQuad',
+  'easeOutQuad',
+  'easeInOutQuad',
+  'easeOutInQuad',
+  'easeInCubic',
+  'easeOutCubic',
+  'easeInOutCubic',
+  'easeOutInCubic',
+  'easeInQuart',
+  'easeOutQuart',
+  'easeInOutQuart',
+  'easeOutInQuart',
+  'easeInQuint',
+  'easeOutQuint',
+  'easeInOutQuint',
+  'easeOutInQuint',
+  'easeInExpo',
+  'easeOutExpo',
+  'easeInOutExpo',
+  'easeOutInExpo',
+  'easeInCirc',
+  'easeOutCirc',
+  'easeInOutCirc',
+  'easeOutInCirc',
+  'easeInBack',
+  'easeOutBack',
+  'easeInOutBack',
+  'easeOutInBack',
+  'easeInBounce',
+  'easeInOutBounce',
+  'easeOutBounce',
+  'easeOutInBounce',
+]
 
 const settingsStore = useSettingsStore()
 
@@ -371,7 +438,7 @@ function animate() {
       grid: [settingsStore.dimension, settingsStore.dimension],
       from: 'center',
     }),
-    easing: 'easeInOutQuad',
+    easing: settingsStore.easing,
     loop: true,
     update({ progress }) {
       progressInput.value.value = Math.round(progress * 1000) / 1000
@@ -421,7 +488,8 @@ function onClearInput() {
   base64Image.value = ''
 }
 
-const { period, scaleMin, scaleMax, wavelength, waves } = toRefs(settingsStore)
+const { easing, period, scaleMin, scaleMax, wavelength, waves } =
+  toRefs(settingsStore)
 
 onMounted(() => {
   animate()
@@ -430,9 +498,13 @@ onMounted(() => {
     nextTick(animate)
   })
 
-  watchThrottled([period, scaleMin, scaleMax, wavelength, waves], animate, {
-    throttle: 500,
-  })
+  watchThrottled(
+    [easing, period, scaleMin, scaleMax, wavelength, waves],
+    animate,
+    {
+      throttle: 500,
+    },
+  )
 })
 </script>
 
